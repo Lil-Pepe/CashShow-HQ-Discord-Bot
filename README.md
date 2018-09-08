@@ -1,2 +1,4 @@
 # CashShow-HQ-Discord-Bot
-Cash Show/HQ Discord bot that retrieves the best results and send them on Discord
+This bot is made to retrieve question's best answers and send them into a Discord channel.
+Fell free to modify it and enhance it
+
