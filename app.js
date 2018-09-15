@@ -4,7 +4,8 @@ gm = require('gm'), //Including the module that crops the screenshot of your Des
 nodecr = require('nodecr'), //Including the OCR = Image to text
 request = require('request'), //Including the request module
 d = [], //
-p = [0, 0, 0], // Percentage per answer array
+p = [0, 0, 0],
+wbw = [], // Percentage per answer array
 bodGoogle, // toLowerCase google question html code
 bodBing,
 question, // String question
@@ -60,48 +61,35 @@ client.on('message', msg => { // on Discord message event
 
               //Splitting the answers every ' ' to create an array that contains every words of each answers
               words = [
-                answers[0].toLowerCase().split(' '),
-                answers[1].toLowerCase().split(' '),
-                answers[2].toLowerCase().split(' ')
+                answers[0].toLowerCase().trim().split(' '),
+                answers[1].toLowerCase().trim().split(' '),
+                answers[2].toLowerCase().trim().split(' ')
               ];
 
-              console.log('Mots contenus dans les rep. : ', words); //Logging every words of each answers
+              console.log('[INFO] Mots par mots : ', words); //Logging every words of each answers
 
               // Check if answers match with the requests bodies word by word
               for (i=0;i < words.length; i++) {
                 for (t=0;t < words[i].length; t++) {
                   if (words[i][t].length <= 2) { // If the string length is < 2
-                    if (isNaN(words[i][t]) === false) { // If the string is a number
-                      pointsAnswer[i] = pointsAnswer[i]+(bodGoogle.match(new RegExp(words[i][t], 'gm')) || []).length+(bodBing.match(new RegExp(answers[0], 'gm')) || []).length; //
-                    }
                   } else {
-                    if (config.ignoreList.some(word => words[i][t].toLowerCase().includes(word))) { // If the
+                    if (config.ignoreList.some(word => words[i][t].toLowerCase().includes(word))) { // If the word is contained in the ignore list
                     } else {
-                      pointsAnswer[i] = pointsAnswer[i]+(bodGoogle.match(new RegExp(words[i][t], 'gm')) || []).length+(bodBing.match(new RegExp(answers[0], 'gm')) || []).length;
+                      wbw[i] = (bodGoogle.match(new RegExp(words[i][t], 'gm')) || []).length
+                      pointsAnswer[i] = (bodGoogle.match(new RegExp(words[i][t], 'gm')) || []).length+(bodGoogle.match(new RegExp(answers[i], 'gm')) || []).length*3+(bodBing.match(new RegExp(answers[i], 'gm')) || []).length*3;
                     }
                   }
                 }
               }
-
-              // Number of occurrences for each answers
               var c = [
-                (bodGoogle.match(new RegExp(answers[0], 'gm')) || []).length,
+                (bodGoogle.match(new RegExp(answers[0], 'gm')) || []).length, // Check if the whole answer is contained in the bodies
                 (bodGoogle.match(new RegExp(answers[1], 'gm')) || []).length,
                 (bodGoogle.match(new RegExp(answers[2], 'gm')) || []).length,
                 (bodBing.match(new RegExp(answers[0], 'gm')) || []).length,
                 (bodBing.match(new RegExp(answers[1], 'gm')) || []).length,
                 (bodBing.match(new RegExp(answers[2], 'gm')) || []).length
               ];
-
-              // If the whole answer is found in the bodies, add 3 points for the answer
-              pointsAnswer = [
-                pointsAnswer[0]+c[0]*3+c[3]*3,
-                pointsAnswer[1]+c[1]*3+c[4]*3,
-                pointsAnswer[2]+c[2]*3+c[5]*3
-              ];
-
-              console.log(`Points par réponses (Google) : ${c[0]}, ${c[1]}, ${c[2]}`); //Logging the points per answer in the Google body
-              console.log(`Points par réponses (Bing) : ${c[3]}, ${c[4]}, ${c[5]}`);//Logging the points per answer in the Bing body
+              console.log(`Points par réponses (Google, Bing, WBW) : [${c[0]}, ${c[3]}, ${wbw[0]}], [${c[1]}, ${c[4]}, ${wbw[1]}], [${c[2]}, ${c[5]}, ${wbw[2]}]`);
               console.log(`Total des points : ${pointsAnswer}`); //Logging the total of points
 
               var sQ = '(Source)['+results.question.replace(/\s/gm, '%20')+']';
@@ -137,7 +125,7 @@ client.on('message', msg => { // on Discord message event
                 .addField('Probabilités', `${p[0].toFixed(2)}%\n${p[1].toFixed(2)}%\n${p[2].toFixed(2)}%`, true)
 
                 if (tot === 0) { // If no point, the answer is a tie
-                  embed.addField('Meilleure réponse', " ¯\\_(ツ)_/¯ ", true)
+                  embed.addField('Meilleure réponse', " 🤷 ", true)
                 } else {
                   embed.addField('Meilleure réponse', `**${answers[id]}**`, true)
                 }
@@ -156,7 +144,7 @@ client.on('message', msg => { // on Discord message event
                 .setColor('#FF0500')
                 .setTitle(question)
                 .addField('Réponses', `${d[0]}\n${d[1]}\n${d[2]}`, true)
-                .addField('Probabilités', `${p[0].toFixed(2)}%\n${p[1].toFixed(2)}%\n${p[2].toFixed(2)}%`, true)
+                .addField('Probabilités', `${p[0].toFixed(2)}% **(${pointsAnswer[0]})**\n${p[1].toFixed(2)}% **(${pointsAnswer[1]})**\n${p[2].toFixed(2)}% **(${pointsAnswer[2]})**`, true)
                 if (tot === 0) {
                   embed.addField('Meilleure réponse', " ¯\\_(ツ)_/¯ ", true)
                 } else {
@@ -171,7 +159,7 @@ client.on('message', msg => { // on Discord message event
                 console.log('Remise à zéro...')
                 pointsAnswer = [0, 0, 0]; //reseting the points per answers array
                 p = [0, 0, 0]; //Reseting the probability array
-                answers = [0, 0, 0]; //Reseting the answers array
+                c = [0, 0, 0];
               }
             });
           });
