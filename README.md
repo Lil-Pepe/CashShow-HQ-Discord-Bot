@@ -17,8 +17,3 @@ The bot is quite easy to use :
 - Invite the bot to your server.
 - Use the trigger command set in the ```config.js``` file to trigger the bot.
 Then the bot will send the answers after looking the Internet.
-
-## Incoming changes/features
-- Detect a tie between answers
-- Better optical character recognition
-- Less delay between trigger command and the sending in Discord
