@@ -1,6 +1,5 @@
 # CashShow-HQ-Discord-Bot
-This NodeJS based bot has been made to retrieve question best answers and send them into a Discord channel.
-Fell free to modify it and enhance it.
+This NodeJS based bot has been made to retrieve question best answers and send them to a Discord channel.
 
 ## Installation
 ```
@@ -8,7 +7,7 @@ $ git clone https://github.com/Lil-Pepe/CashShow-HQ-Discord-Bot
 $ cd CashShow-HQ-Discord-Bot
 $ npm install
 ```
-When the bot is downloaded and installed, please edit the ```config.js``` and fill the ```token``` string corresponding to your Discord bot's token and the ```width``` integer corresponding to your screen width.
+When the bot is downloaded and installed, please edit the ```config.js``` file and fill the ```token``` string corresponding to your Discord bot's token. The ```width``` integer corresponds to your screen width.
 
 ## Usage
 The bot is quite easy to use :
